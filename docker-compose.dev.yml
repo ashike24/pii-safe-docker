@@ -1,0 +1,23 @@
+# docker-compose.dev.yml
+# ========================
+# Development override — hot reload, exposed ports, no nginx
+#
+# Usage:
+#   docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+version: "3.9"
+
+services:
+  api:
+    build:
+      target: development
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app               # full mount for hot reload
+    environment:
+      DEBUG: "true"
+      LOG_LEVEL: debug
+
+  # Skip nginx in dev — hit the API directly on :8000
+  nginx:
+    profiles: ["production"]  # only starts when profile=production
